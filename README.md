@@ -16,12 +16,11 @@ Apple-silicon Mac, with no API calls.
 
 - **Item in, point out.** Ask for the item ("the wifi toggle", "Add to cart under Wool rug"),
   not an instruction ("turn off wifi"). Resolving intent into an item is the planner's job.
-- **Fast.** The screen is read once (about 1.2 s on an M4); every further item on that screen
-  answers in about 0.3 s. `prime()` does the read ahead of time, while the planner is still thinking.
+- **Fast.** A screenshot is read once (about 1.2 s on an M4 Mac); every further item on that screenshot
+  answers in about 0.3 s. `prime()` does the read ahead of time, while whatever decides what to click is
+  still thinking.
 - **Exact on grids.** Chess boards, spreadsheets, seat maps and survey matrices addressed by code
-  (`e4`, `C27`, `seat B16`) are found by measuring the grid and reading its labels, not by guessing:
-  on a generated test set the model alone is off by a row or a file much of the time; snapped, it
-  is exact (see [docs/how-it-works.md](docs/how-it-works.md)).
+  (`e4`, `C27`, `seat B16`) are found by measuring the grid and reading its labels, not by guessing.
 - **A confidence you can use.** 0-1, from the model's own certainty in the digits it writes.
 
 Under the hood: [GUI-Owl-1.5-4B](https://huggingface.co/mPLUG/GUI-Owl-1.5-4B-Instruct) (MIT),
@@ -89,18 +88,41 @@ repo id; a repo that already holds an MLX-quantised copy is used as is.
 `adapters=` takes an optional LoRA (`lora.safetensors`, a file, directory or repo id) for the
 language layers. It is not needed for the grid-snapping results above.
 
-## Limits (read these)
+## Benchmarks
 
-- macOS on Apple silicon only, today. The engine is MLX; the grid code and the HTTP/MCP layers
+Measured on an M4 MacBook, 16 GB, default settings (`pixels=409600`, no adapters).
+
+**Icons on real screenshots** (ScreenSpot-v2, public benchmark of web, desktop and mobile screens;
+icon targets only; every second item, 277 of 554):
+
+| `pixels=` | accuracy | screen read | per item |
+|---|---|---|---|
+| 409600 (default) | ~83% | ~1.1 s | ~0.3 s |
+| 786432 | ~87% | ~2.3 s | ~0.35 s |
+
+**Grid cells by code** (generated screens: chess boards with and without coordinates, spreadsheets,
+theatre seat maps, survey matrices, striped tables; item named like `e4` or `C27`):
+
+| | model alone | with grid snapping |
+|---|---|---|
+| chess squares (180) | ~57% | 99-100% |
+| spreadsheet cells (200) | ~46% | 99-100% |
+| seats (125) | - | 100% |
+
+These are our own measurements on one machine and our own generated grids, not a published
+leaderboard. `docs/how-it-works.md` says how each number was taken.
+
+## Limits
+
+- Apple-silicon Macs only for now: the model runs on MLX. The grid code and the HTTP/MCP layers
   are portable.
-- About 78-85% on ScreenSpot-v2 *icons* in the configurations measured during development, not 90%.
-  Published 4B/8B GUI specialists are in the same range. Icon and tiny-target pointing at 0.4 MP is
-  the weak spot: raise `pixels=` (786432 is the full-quality read, about 2x slower) for small targets.
-- It points at the *item*, so vague or relational wording ("the cheapest one", "the third row")
-  should be resolved by the planner into something visible first.
-- Grid snapping applies to coded references only (letter/number labels such as `C27`, `e4`).
-  Cells named by words ("row Sales, column Q3") are left to the model.
-- One screen is held at a time, one request is served at a time.
+- Small icons are the hard case: at the default read size an icon can be a few pixels wide.
+  Raise `pixels=` for dense screens (about 2x slower per screen).
+- It points at the *item*, so relational wording ("the cheapest one", "the third row") should be turned
+  into something visible ("Add to cart under Wool rug") before asking.
+- Grid snapping applies to coded references only (letter/number labels such as `C27`, `e4`). Cells named
+  by words ("row Sales, column Q3") are left to the model.
+- One screenshot is held at a time, and one request is served at a time.
 
 ## Develop
 
