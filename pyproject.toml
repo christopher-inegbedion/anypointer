@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "anypointer"
+version = "0.1.0"
+description = "Name a thing on a screenshot, get the pixel to click. On-device pointing for GUI agents (GUI-Owl on MLX) with exact grid-cell snapping."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "anypointer contributors" }]
+keywords = ["gui-agent", "grounding", "pointing", "screenshot", "computer-use", "mlx", "vlm", "mcp"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Operating System :: MacOS",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+# MLX runs on Apple-silicon Metal; the model code is MLX-only for now.
+dependencies = [
+    "mlx-vlm>=0.7,<0.8; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "huggingface_hub>=0.24",
+    "numpy>=1.26",
+    "pillow>=10.1",
+]
+
+[project.optional-dependencies]
+# Reads grid labels (row numbers, column letters) with macOS's built-in text recognition.
+macos = ["pyobjc-framework-Vision>=10.0; sys_platform == 'darwin'", "pyobjc-framework-Quartz>=10.0; sys_platform == 'darwin'"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+anypointer = "anypointer.cli:main"
+
+[project.urls]
+Source = "https://github.com/OWNER/anypointer"
+Issues = "https://github.com/OWNER/anypointer/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/anypointer"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "docs", "README.md", "LICENSE", "NOTICE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["model: needs the GUI-Owl weights (set ANYPOINTER_TEST_MODEL to a converted model dir)"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501", "E731"]

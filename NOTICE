@@ -1,0 +1,8 @@
+anypointer
+Copyright 2026 anypointer contributors
+
+Licensed under the Apache License, Version 2.0.
+
+This package runs GUI-Owl-1.5-4B-Instruct (https://huggingface.co/mPLUG/GUI-Owl-1.5-4B-Instruct),
+released by its authors under the MIT license. The weights are not included; they are downloaded
+and converted to MLX on first use. Their licence and attribution travel with that download.
