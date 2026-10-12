@@ -32,7 +32,8 @@ screen blocks that matter before it writes the coordinate.
 Needs an Apple-silicon Mac (MLX). Python 3.10+.
 
 ```sh
-pip install "anypointer[macos]"        # [macos] adds Apple Vision OCR, used to read grid labels
+pip install "anypointer[macos] @ git+https://github.com/christopher-inegbedion/anypointer"
+# [macos] adds Apple Vision OCR, used to read grid labels
 anypointer fetch                       # optional: download + convert now (a multi-GB download, ~3 GB on disk after conversion)
 ```
 
