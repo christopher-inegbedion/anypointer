@@ -41,8 +41,8 @@ dev = ["pytest>=8.0", "ruff>=0.6"]
 anypointer = "anypointer.cli:main"
 
 [project.urls]
-Source = "https://github.com/OWNER/anypointer"
-Issues = "https://github.com/OWNER/anypointer/issues"
+Source = "https://github.com/christopher-inegbedion/anypointer"
+Issues = "https://github.com/christopher-inegbedion/anypointer/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/anypointer"]
